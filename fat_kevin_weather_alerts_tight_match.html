@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Fat Kevin Weather Alerts</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      color: #222;
+      padding: 10px;
+    }
+    .alert-box {
+      background: #fff;
+      border-left: 5px solid #d9534f;
+      margin: 10px 0;
+      padding: 10px;
+      box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+    }
+    .alert-title {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>Active Weather Alerts (All Types)</h2>
+  <div id="alerts">Loading alerts...</div>
+
+  <script>
+    const countiesToInclude = [
+      "Benton County", "Washington County", "Carroll County", "Madison County", "Crawford County", "Franklin County",
+      "Johnson County", "Pope County", "Sebastian County", "Logan County", "Scott County", "Yell County", "Polk County",
+      "Delaware County", "Adair County", "Sequoyah County", "Le Flore County", "McCurtain County", "Pushmataha County",
+      "Latimer County", "Pittsburg County", "Haskell County", "McIntosh County", "Muskogee County", "Okmulgee County",
+      "Cherokee County", "Wagoner County", "Tulsa County", "Mayes County", "Rogers County"
+    ];
+
+    function fetchAlerts() {
+      fetch("https://api.weather.gov/alerts/active")
+        .then(response => response.json())
+        .then(data => {
+          const alertsDiv = document.getElementById("alerts");
+          alertsDiv.innerHTML = "";
+
+          const alerts = data.features.filter(alert => {
+            const areaList = alert.properties.areaDesc.split(',').map(area => area.trim());
+            return areaList.some(area =>
+              countiesToInclude.some(county =>
+                area === county || area === county + ", AR" || area === county + ", OK"
+              )
+            );
+          });
+
+          if (alerts.length === 0) {
+            alertsDiv.innerHTML = "<p>No active alerts for your area.</p>";
+          } else {
+            alerts.forEach(alert => {
+              const box = document.createElement("div");
+              box.className = "alert-box";
+              box.innerHTML = `
+                <div class="alert-title">${alert.properties.headline}</div>
+                <div>${alert.properties.description}</div>
+                <div><strong>Event:</strong> ${alert.properties.event}</div>
+                <div><strong>Effective:</strong> ${new Date(alert.properties.effective).toLocaleString()}</div>
+                <div><strong>Expires:</strong> ${new Date(alert.properties.expires).toLocaleString()}</div>
+              `;
+              alertsDiv.appendChild(box);
+            });
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching alerts:", error);
+          document.getElementById("alerts").innerHTML = "<p>Error loading alerts.</p>";
+        });
+    }
+
+    fetchAlerts();
+    setInterval(fetchAlerts, 300000);
+  </script>
+</body>
+</html>
