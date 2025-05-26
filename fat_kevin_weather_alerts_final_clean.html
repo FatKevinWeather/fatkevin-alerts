@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Fat Kevin Weather Alerts</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      color: #222;
+      padding: 10px;
+    }
+    .alert-box {
+      background: #fff;
+      border-left: 5px solid #d9534f;
+      margin: 10px 0;
+      padding: 10px;
+      box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+    }
+    .alert-title {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>Active Weather Alerts</h2>
+  <div id="alerts">Loading alerts...</div>
+
+  <script>
+    const countiesToInclude = [
+      "Benton", "Washington", "Carroll", "Madison", "Crawford", "Franklin", "Johnson", "Pope", "Sebastian", "Logan", "Scott", "Yell", "Polk",
+      "Delaware", "Adair", "Sequoyah", "Le Flore", "McCurtain", "Pushmataha", "Latimer", "Pittsburg", "Haskell", "McIntosh", "Muskogee", "Okmulgee",
+      "Cherokee", "Wagoner", "Tulsa", "Mayes", "Rogers"
+    ];
+
+    function fetchAlerts() {
+      fetch("https://api.weather.gov/alerts/active")
+        .then(response => response.json())
+        .then(data => {
+          const alertsDiv = document.getElementById("alerts");
+          alertsDiv.innerHTML = "";
+
+          const alerts = data.features.filter(alert => {
+            const areaDesc = alert.properties.areaDesc;
+            return countiesToInclude.some(county =>
+              areaDesc.includes(county) || areaDesc.includes(county + " County")
+            );
+          });
+
+          if (alerts.length === 0) {
+            alertsDiv.innerHTML = "<p>No active alerts for your area.</p>";
+          } else {
+            alerts.forEach(alert => {
+              const box = document.createElement("div");
+              box.className = "alert-box";
+              box.innerHTML = `
+                <div class="alert-title">${alert.properties.headline}</div>
+                <div>${alert.properties.description}</div>
+                <div><strong>Effective:</strong> ${new Date(alert.properties.effective).toLocaleString()}</div>
+                <div><strong>Expires:</strong> ${new Date(alert.properties.expires).toLocaleString()}</div>
+              `;
+              alertsDiv.appendChild(box);
+            });
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching alerts:", error);
+          document.getElementById("alerts").innerHTML = "<p>Error loading alerts.</p>";
+        });
+    }
+
+    fetchAlerts();
+    setInterval(fetchAlerts, 300000);
+  </script>
+</body>
+</html>
