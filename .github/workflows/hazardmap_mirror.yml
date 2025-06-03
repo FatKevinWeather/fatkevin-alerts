@@ -30,3 +30,4 @@ jobs:
           git commit -m "Auto-update hazard map"
           git push
         fi
+      continue-on-error: true
