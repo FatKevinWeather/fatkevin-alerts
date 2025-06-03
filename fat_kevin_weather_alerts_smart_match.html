@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Fat Kevin Weather Alerts (Tight Smart Match)</title>
+  <title>Fat Kevin Weather Alerts (Smart Match V2)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -23,7 +23,7 @@
   </style>
 </head>
 <body>
-  <h2>Active Weather Alerts (Tight Smart Match)</h2>
+  <h2>Active Weather Alerts (Smart Match V2)</h2>
   <div id="alerts">Loading alerts...</div>
 
   <script>
@@ -52,9 +52,9 @@
 
           const alerts = data.features.filter(alert => {
             const ugcList = alert.properties.geocode.UGC || [];
-            const isARorOK = ugcList.some(code => code.startsWith("AR") || code.startsWith("OK"));
+            const isOnlyARorOK = ugcList.every(code => code.startsWith("AR") || code.startsWith("OK"));
 
-            if (!isARorOK) return false;  // restrict to AR and OK only
+            if (!isOnlyARorOK) return false;
 
             const areaList = alert.properties.areaDesc.split(',').map(area => normalizeName(area));
 
