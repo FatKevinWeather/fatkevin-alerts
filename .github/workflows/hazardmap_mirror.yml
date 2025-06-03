@@ -19,10 +19,11 @@ jobs:
       run: |
         curl -o hazardmap.png https://forecast.weather.gov/wwamap/png/TSA.png
 
-    - name: Commit new map
-      run: |
-        git config user.name "Fat Kevin Weather Bot"
-        git config user.email "fatkevinweather@example.com"
-        git add hazardmap.png
-        git commit -m "Auto-update hazard map" || echo "No changes to commit"
-        git push
+ - name: Commit new map
+  run: |
+    git config user.name "Fat Kevin Weather Bot"
+    git config user.email "fatkevinweather@example.com"
+    git add hazardmap.png
+    git commit -m "Auto-update hazard map" || echo "No changes to commit"
+    git push
+
