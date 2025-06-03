@@ -19,10 +19,14 @@ jobs:
       run: |
         curl -o hazardmap.png https://forecast.weather.gov/wwamap/png/TSA.png
 
-    - name: Commit new map
+    - name: Commit new map if changes exist
       run: |
         git config user.name "Fat Kevin Weather Bot"
         git config user.email "fatkevinweather@example.com"
         git add hazardmap.png
-        git diff --staged --quiet || git commit -m "Auto-update hazard map"
-        git push
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Auto-update hazard map"
+          git push
+        fi
