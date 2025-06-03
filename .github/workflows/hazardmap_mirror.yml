@@ -17,19 +17,18 @@ jobs:
 
     - name: Download Hazard Map
       run: |
-        curl -o hazardmap.png https://forecast.weather.gov/wwamap/png/TSA.png
+        curl -s -o hazardmap.png https://forecast.weather.gov/wwamap/png/TSA.png
 
-    - name: Commit new map if changes exist
+    - name: Check for changes
+      id: check_changes
       run: |
-        (
-          git config user.name "Fat Kevin Weather Bot"
-          git config user.email "fatkevinweather@example.com"
-          git add hazardmap.png
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Auto-update hazard map"
-            git push
-          fi
-        ) || true
+        git config user.name "Fat Kevin Weather Bot"
+        git config user.email "fatkevinweather@example.com"
+        git add hazardmap.png
+        git diff --staged --quiet && echo "changed=false" >> $GITHUB_ENV || echo "changed=true" >> $GITHUB_ENV
 
+    - name: Commit and Push Changes
+      if: env.changed == 'true'
+      run: |
+        git commit -m "Auto-update hazard map"
+        git push
