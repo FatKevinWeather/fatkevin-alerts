@@ -8,6 +8,9 @@ on:
 jobs:
   update-map:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -21,6 +24,5 @@ jobs:
         git config user.name "Fat Kevin Weather Bot"
         git config user.email "fatkevinweather@example.com"
         git add hazardmap.png
-        git commit -m "Auto-update hazard map"
+        git commit -m "Auto-update hazard map" || echo "No changes to commit"
         git push
-      continue-on-error: true
